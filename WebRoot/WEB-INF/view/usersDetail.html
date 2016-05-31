@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<script type="text/javascript" src="js/jquery-1.4.js"></script>
+<script type="text/javascript" src="js/framework.js"></script>
+<link href="css/import_basic.css" rel="stylesheet" type="text/css" />
+<link href="skins/sky/import_skin.css" rel="stylesheet" type="text/css" />
+<!--框架必需end-->
+
+<script type="text/javascript" src="js/nav/ddaccordion.js"></script>
+<script type="text/javascript" src="js/text/text-overflow.js"></script>
+<script type="text/javascript" src="js/form/datePicker/WdatePicker.js"></script>
+
+<style>
+	
+</style>
+
+<script>
+	function getContextPath(){ 
+		var pathName = document.location.pathname; 
+		var index = pathName.substr(1).indexOf("/"); 
+		var result = pathName.substr(0,index+1); 
+		return result; 
+	} 
+
+	//保存操作
+	function saveData(){
+		if($("#username").val()==""){
+			top.Dialog.alert("姓名不能为空！");
+			return false;
+		}
+		if($("#age").val()==""){
+			top.Dialog.alert("年龄不能为空！");
+			return false;
+		}else{
+			var reg=/^[0-9]*$/;
+			if(!reg.test($("#age").val()) || parseInt($("#age").val())>150){
+				top.Dialog.alert("年龄格式不正确！");
+				return false;
+			}
+		}
+		if($("#accountNum").val()==""){
+			top.Dialog.alert("账号不能为空！");
+			return false;
+		}
+		if($("#password").val()==""){
+			top.Dialog.alert("密码不能为空！");
+			return false;
+		}
+		var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X)$)/;
+		if(!reg.test($("#sfz").val())){
+			top.Dialog.alert("身份证格式不正确！");
+			return false;
+		}
+		if($("#phone").val()==""){
+			top.Dialog.alert("手机号码不能为空！");
+			return false;
+		}else{
+			var reg=/^(13[0-9]|15[0-9]|177|147|18[0-9])[0-9]{8}$/;
+			if(!reg.test($("#phone").val())){
+				top.Dialog.alert("手机号码格式不正确！");
+				return false;
+			}
+		}
+		$.ajax({
+			async:false,
+			url : getContextPath()+"/sub.do?method=editUser" ,
+			type: "POST",
+			data:$("#userForm").serialize(),
+			cache: false,
+			dataType:"json",
+			success:function(result){
+				if(result.state==1){
+					top.Dialog.alert(result.msg,function(){
+						top.Dialog.parentWindow.search();
+						top.Dialog.close();
+					});
+				}else{
+					top.Dialog.alert(result.msg);
+				}
+			},
+			error:function(){
+				top.Dialog.alert("操作异常");
+			}
+		});
+	}
+</script>
+
+
+<body>
+	<div class="position">
+		<div class="center">
+			<div class="left">
+				<div class="right" style="width: 101%">
+					<span>当前位置：用户信息&gt;&gt; 用户新增</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form id="userForm" method="post">
+		<input type="hidden" name="userbh" value="${userInfo.userbh}" />
+		<input type="hidden" name="id" value="${userInfo.id}" />
+		<table class="tableStyle" style="text-align: left;">
+			<tr>
+				<td width="80px;">姓名：</td><td>${userInfo.username!}</td>
+			</tr>
+			
+			<tr>
+				<td>性别：</td><td><input type="radio" checked="checked" name="sex" /><#if userInfo.sex==1> 男 <#elseif userInfo.sex==0> 女</#if></td>
+			</tr>
+			
+			<tr>
+				<td>年龄（岁）：</td><td>${userInfo.age!}</td>
+			</tr>
+			
+			<tr>
+				<td>账号：</td><td>${userInfo.accountNum!}</td>
+			</tr>
+			
+			<tr>
+				<td>密码：</td><td>${userInfo.password!}</td>
+			</tr>
+			
+			<tr>
+				<td>类型：</td>
+				<td>
+					<select name="type"  disabled="disabled">
+						<option value="0" <#if userInfo.type==0> selected</#if>>管理员</option>
+						<option value="1" <#if userInfo.type==1> selected</#if>>车主</option>
+						<option value="2" <#if userInfo.type==2> selected</#if>>普通用户</option>
+					</select>	
+				</td>
+			</tr>
+			
+			<tr>
+				<td>身份证号码：</td><td>${userInfo.sfz!}</td>
+			</tr>
+			
+			<tr>
+				<td>电话号码：</td><td>${userInfo.phone!}</td>
+			</tr>
+			
+			<tr>
+				<td>住址：</td>
+				<td>
+					<textarea style="width:90%;" name="address" readonly="readonly">${userInfo.address!}</textarea>
+				</td>
+			</tr>
+			
+			<!-- <tr>
+				<td>是否开启权限：</td><td>是<input type="radio" name="permission" value="1" <#if userInfo.permission==1>checked</#if>/>否<input type="radio" name="permission" value="0"  <#if userInfo.permission==0>checked</#if>/></td>
+			</tr> -->
+		</table>
+	</form>
+</body>

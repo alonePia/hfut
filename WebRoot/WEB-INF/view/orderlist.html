@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<script type="text/javascript" src="js/jquery-1.4.js"></script>
+<script type="text/javascript" src="js/framework.js"></script>
+<link href="css/import_basic.css" rel="stylesheet" type="text/css" />
+<link href="skins/sky/import_skin.css" rel="stylesheet" type="text/css" />
+<!--框架必需end-->
+
+<!-- 分页 -->
+<script type="text/javascript" src="js/jquery.simplePagination.js"></script>
+<link href="css/simplePagination.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript" src="js/nav/ddaccordion.js"></script>
+<script type="text/javascript" src="js/text/text-overflow.js"></script>
+<script type="text/javascript" src="js/form/datePicker/WdatePicker.js"></script>
+
+<#if msg?? && msg!="">
+<script>
+	top.Dialog.alert("${msg!}");
+</script>
+</#if>
+
+<script>
+	function getContextPath(){ 
+		var pathName = document.location.pathname; 
+		var index = pathName.substr(1).indexOf("/"); 
+		var result = pathName.substr(0,index+1); 
+		return result; 
+	} 
+	
+	var items="${orderslist?size!0}";
+	var pageSize="${pageSize!10}";
+	$(function() {
+		$("#paging").pagination({
+			items : items,//数据条数
+			itemsOnPage : pageSize,//每页显示多少条数据
+			cssStyle : 'compact-theme',
+            onInit: changePage,
+            onPageClick: changePage
+		});
+	});
+	
+	function changePage(){
+	    //console.log("changePage");
+	    page_index = $("#paging").pagination('getCurrentPage') -1;
+	    $("#mainlist tr[name='trName']").hide();
+	    for(var i = page_index * pageSize; i < page_index * pageSize + pageSize; i++){
+	        $("#mainlist tr[name='trName']:eq(" + i + ")").show();
+	    }
+	}
+
+	function shownewWin() {
+		top.Dialog.parentWindow = window;
+		var dialog = new top.Dialog();
+		dialog.Title = '申请新增';
+		dialog.URL = getContextPath()+'/iframe.do?method=addOrder';
+		dialog.Width = 500;
+		dialog.Height = 400;
+		dialog.OkButtonText = "确定(S)";
+		dialog.CancelButtonText = "取消(X)";
+		dialog.OKEvent = function() {
+			dialog.innerFrame.contentWindow.saveData();
+		};
+		dialog.show();
+	}
+	
+	function showDetailWin(orderBH) {
+		top.Dialog.parentWindow = window;
+		var dialog = new top.Dialog();
+		dialog.Title = '订单查看';
+		dialog.URL = 'iframe.do?method=orderDetail&orderbh='+orderBH;
+		dialog.Width = 550;
+		dialog.Height = 600;
+		dialog.ShowButtonRow=true;
+		dialog.ShowOkButton=false;
+		dialog.CancelButtonText="关闭";
+		dialog.show();
+	}
+	
+	function search(){
+		var owner=$("#owner").val();
+		var carno=$("#carno").val();
+		window.location.href=getContextPath()+"/sub.do?method=orderlist&owner="+owner+"&carno="+carno;
+	}
+	
+	function showEditWin(orderBH) {
+		top.Dialog.parentWindow = window;
+		var dialog = new top.Dialog();
+		dialog.Title = '申请编辑';
+		dialog.URL = getContextPath()+'/iframe.do?method=editOrder&orderbh='+orderBH;
+		dialog.Width = 450;
+		dialog.Height = 430;
+		dialog.OkButtonText = "确定(S)";
+		dialog.CancelButtonText = "取消(X)";
+		dialog.OKEvent = function() {
+			dialog.innerFrame.contentWindow.saveData();
+		};
+		dialog.show();
+	}
+	
+	function del(orderBH){
+		top.Dialog.confirm("确定删除该条记录？",function(){
+			$.ajax({
+			async:false,
+			url : getContextPath()+"/sub.do?method=delOrder",
+			type: "POST",
+			data:{"orderbh":orderBH},
+			cache: false,
+			dataType:"json",
+			success:function(result){
+				if(result.state==1){
+					top.Dialog.alert(result.msg,function(){
+						top.Dialog.close();
+						window.location.reload();
+					});
+				}else{
+					top.Dialog.alert(result.msg);
+				}
+			},
+			error:function(){
+				top.Dialog.alert("操作异常");
+			}
+		});
+		});
+	}
+	
+</script>
+
+
+
+
+<body>
+	<div class="position">
+		<div class="center">
+			<div class="left">
+				<div class="right">
+					<span>当前位置：租赁申请 &gt;&gt; 申请列表</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="box2" panelTitle="功能面板" roller="false">
+		<table>
+			<tr>
+				<td>姓名：</td>
+				<td><input type="text" name="owner" id="owner" />
+				</td>
+				<td>车牌号：</td>
+				<td><input type="text" name="carno" id="carno" />
+				</td>
+				<td><button onclick="search()">
+						<span class="icon_find">查询</span>
+					</button>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<button onclick="shownewWin()">
+						<span class="icon_page">新增</span>
+					</button>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div id="scrollContent" class="border_gray">
+		<table class="tableStyle" id="mainlist">
+			<tr>
+				<th width="12%">订单编号</th>
+				<th width="5%">申请姓名</th>
+				<th width="5%">车主姓名</th>
+				<th width="5%">车牌号</th>
+				<th width="5%">车辆型号</th>
+				<th width="5%">车辆颜色</th>
+				<th width="10%">车辆图片</th>
+				<th width="10%">车主电话</th>
+				<th width="5%">申请状态</th>
+				<th width="8%">开始时间</th>
+				<th width="8%">结束时间</th>
+				<th width="10%">操作时间</th>
+				<th width="7%">操作</th>
+			</tr>
+			<#list orderslist as obj>
+			<tr name="trName">
+				<td width="12%">${obj.orderbh!}</td>
+				<td width="5%">${obj.username!}</td>
+				<td width="5%">${obj.owner!}</td>
+				<td width="5%">${obj.carno!}</td>
+				<td width="5%">${obj.type!}</td>
+				<td width="5%">${obj.color!}</td>
+				<td width="10%" style="text-align: center;"><img src="${contextPath!}/${obj.image!}" width="100px" height="100px" /></td>
+				<td width="10%">${obj.ownerphone}</td>
+				<td width="5%"><#if obj.isback==0>已归还<#elseif obj.isback==1>正在使用</#if></td>
+				<td width="8%">${(obj.startTime?string("yyyy-MM-dd"))!'未知'}</td>
+				<td width="8%">${(obj.endTime?string("yyyy-MM-dd"))!'未知'}</span>
+				</td>
+				<td width="10%">${(obj.czsj?string("yyyy-MM-dd HH:mm:ss"))!'未知'}<#-- ${(user.czsj?string("yyyy-MM-dd"))!'未知'} --></td>
+				<td width="7%">
+					<span class="img_view hand" title="查看" onclick="showDetailWin('${obj.orderbh!}')"></span>
+					<span class="img_edit hand" title="修改" onclick="showEditWin('${obj.orderbh!}')"></span>
+					<span class="img_delete hand" title="删除" onclick="del('${obj.orderbh!}')"></span>
+				</td>
+			</tr>
+			</#list>
+		</table>
+	</div>
+
+
+	<div style="height:35px;">
+		<div id="other" style="margin-top: 4px;float:right;">
+			<!--<input type="text" style="width: 35px;height: 20px;" />
+			<a href="#nogo" class="g_a" style="margin-top: -2px;margin-right: 5px;">
+			    <span class="g_b" style="width: 85px;height: 25px;">
+			        <span class="g_d" style="text-align: center;padding:8px;">跳转到</span>
+			    </span>
+			</a>
+		--></div>
+		<div id="paging" class="page" style="margin-top: 4px;float:right;"></div>
+	</div>
+
+</body>

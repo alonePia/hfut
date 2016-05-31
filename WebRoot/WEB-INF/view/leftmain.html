@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<script type="text/javascript" src="${contextPath!}/js/jquery-1.4.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/framework.js"></script>
+<link href="${contextPath!}/css/import_basic.css" rel="stylesheet" type="text/css"/>
+<link href="${contextPath!}/skins/sky/import_skin.css" rel="stylesheet" type="text/css"/>
+<!--框架必需end-->
+
+<!--<script type="text/javascript" src="js/nav/ddaccordion.js"></script> 控制导航栏 -->
+<script type="text/javascript" src="js/text/text-overflow.js"></script>
+<style>
+a {
+	behavior:url(js/method/focus.htc)
+}
+.categoryitems span{
+	width:160px;
+}
+</style>
+
+<script>
+	//打开内页时出现进度条
+	$(function(){ 
+		$(".categoryitems a[target*=frmright]").click(function(){
+			showProgressBar();
+		});
+	});
+</script>
+
+<body leftFrame="true">
+<div id="scrollContent">
+<div class="arrowlistmenu">
+
+<div class="menuheader expandable"><span class="normal_icon1"></span>用户信息</div>
+<ul class="categoryitems">
+<li><a href="sub.do?method=userlist" target="frmright" class="spanStyle"><span class="text_slice">用户列表</span></a></li>
+</ul>
+
+<div class="menuheader expandable"><span class="normal_icon2"></span>租赁申请</div>
+<ul class="categoryitems">
+<li><a href="sub.do?method=orderlist" target="frmright" class="spanStyle"><span class="text_slice">申请列表</span></a></li>
+</ul>
+
+<div class="menuheader expandable"><span class="normal_icon2"></span>车辆管理</div>
+<ul class="categoryitems">
+<li><a href="sub.do?method=carslist" target="frmright" class="spanStyle"><span class="text_slice">车辆列表</span></a></li>
+</ul>
+
+<div class="menuheader expandable"><span class="normal_icon2"></span>信息查询</div>
+<ul class="categoryitems">
+<li><a href="sub.do?method=repairlist" target="frmright" class="spanStyle"><span class="text_slice">事故查询</span></a></li>
+<!-- <li><a href="sub.do?method=brokelist" target="frmright" class="spanStyle"><span class="text_slice">违章查询</span></a></li> -->
+</ul>
+
+</div>
+</div>					
+</body>
+</html>

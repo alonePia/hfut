@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<link href="${contextPath!}/css/import_basic.css" rel="stylesheet" type="text/css" />
+<link href="${contextPath!}/skins/sky/import_skin.css" rel="stylesheet" type="text/css" />
+<link href="${contextPath!}/js/uploadify/uploadify.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="${contextPath!}/js/jquery-1.4.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/framework.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/uploadify/jquery.uploadify.min.js" />
+<!--框架必需end-->
+
+<script type="text/javascript" src="${contextPath!}/js/nav/ddaccordion.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/text/text-overflow.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/form/datePicker/WdatePicker.js"></script>
+
+<style>
+	
+</style>
+
+<script>
+	function getContextPath(){ 
+		var pathName = document.location.pathname; 
+		var index = pathName.substr(1).indexOf("/"); 
+		var result = pathName.substr(0,index+1); 
+		return result; 
+	} 
+
+	//保存操作
+	function saveData(){
+		if($("#carno").val()==""){
+			top.Dialog.alert("车牌号不能为空！");
+			return false;
+		}
+		if($("#type").val()==""){
+			top.Dialog.alert("车辆型号不能为空！");
+			return false;
+		}
+		if($("#color").val()==""){
+			top.Dialog.alert("车辆颜色不能为空！");
+			return false;
+		}
+		if($("#image").val()==""){
+			top.Dialog.alert("车辆图片不能为空！");
+			return false;
+		}
+		if($("#owner").val()==""){
+			top.Dialog.alert("车主姓名不能为空！");
+			return false;
+		}
+		if($("#ownersfz").val()==""){
+			top.Dialog.alert("车主身份证号码不能为空！");
+			return false;
+		}else{
+			var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X)$)/;
+			if(!reg.test($("#ownersfz").val())){
+				top.Dialog.alert("身份证格式不正确！");
+				return false;
+			}
+		}
+		if($("#ownerphone").val()==""){
+			top.Dialog.alert("车主手机号码不能为空！");
+			return false;
+		}else{
+			var reg=/^(13[0-9]|15[0-9]|177|147|18[0-9])[0-9]{8}$/;
+			if(!reg.test($("#ownerphone").val())){
+				top.Dialog.alert("手机号码格式不正确！");
+				return false;
+			}
+		}
+		$.ajax({
+			async:false,
+			url : getContextPath()+"/sub.do?method=editCar" ,
+			type: "POST",
+			data:$("#carForm").serialize(),
+			cache: false,
+			dataType:"json",
+			success:function(result){
+				if(result.state==1){
+					top.Dialog.alert(result.msg,function(){
+						top.Dialog.parentWindow.search();
+						top.Dialog.close();
+					});
+				}else{
+					top.Dialog.alert(result.msg);
+				}
+			},
+			error:function(){
+				top.Dialog.alert("操作异常");
+			}
+		});
+	}
+	
+</script>
+
+
+<body>
+	<div class="position">
+		<div class="center">
+			<div class="left">
+				<div class="right" style="width: 101%">
+					<span>当前位置：车辆管理&gt;&gt; 车辆编辑</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form id="carForm" method="post">
+		<input type="hidden" value="${carInfo.id!}" name="id" />
+		<input type="hidden" value="${carInfo.carbh!}" name="carbh" />
+		<table class="tableStyle" style="text-align: left;">
+			<tr>
+				<td width="80px;">车牌号：</td><td>${carInfo.carno!}</td>
+			</tr>
+			
+			<tr>
+				<td>车辆品牌：</td><td>${carInfo.type!}</td>
+			</tr>
+			
+			<tr>
+				<td>颜色：</td><td>${carInfo.color!}</td>
+			</tr>
+			
+			<tr>
+				<td>图片展示：</td>
+				<td>
+					<input type="hidden" value="${carInfo.image!}" name="image" id="image"/>
+					<img width="122px;" height="122px;" id="showImg"  src="${contextPath}/${carInfo.image!}" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td>车主姓名：</td><td>${carInfo.owner!}</td>
+			</tr>
+			
+			<tr>
+				<td>车主性别：</td><td><#if carInfo.ownersex==1>男<#elseif carInfo.ownersex==0>女</#if><input type="radio" name="ownersex" value="1"  checked/></td>
+			</tr>
+			
+			<tr>
+				<td>车主身份证：</td><td>${carInfo.ownersfz!}</td>
+			</tr>
+			
+			<tr>
+				<td>车主电话：</td><td>${carInfo.ownerphone!}</td>
+			</tr>
+			
+			<tr>
+				<td>使用状态：</td>
+				<td>
+					<select name="state" style="width: 155px;" disabled="disabled" >
+						<option value="0" <#if carInfo.state==0>selected</#if> >未使用</option>
+						<option value="1" <#if carInfo.state==1>selected</#if> >正在使用</option>
+						<option value="2" <#if carInfo.state==2>selected</#if> >维修</option>
+						<option value="3" <#if carInfo.state==3>selected</#if> >报销</option>
+					</select>	
+				</td>
+			</tr>
+		</table>
+	</form>
+</body>

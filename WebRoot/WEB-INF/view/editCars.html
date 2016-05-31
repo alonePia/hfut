@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<link href="${contextPath!}/css/import_basic.css" rel="stylesheet" type="text/css" />
+<link href="${contextPath!}/skins/sky/import_skin.css" rel="stylesheet" type="text/css" />
+<link href="${contextPath!}/js/uploadify/uploadify.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="${contextPath!}/js/jquery-1.4.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/framework.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/uploadify/jquery.uploadify.min.js" />
+<!--框架必需end-->
+
+<script type="text/javascript" src="${contextPath!}/js/nav/ddaccordion.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/text/text-overflow.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/form/datePicker/WdatePicker.js"></script>
+
+<style>
+	
+</style>
+
+<script>
+	function getContextPath(){ 
+		var pathName = document.location.pathname; 
+		var index = pathName.substr(1).indexOf("/"); 
+		var result = pathName.substr(0,index+1); 
+		return result; 
+	} 
+
+	//保存操作
+	function saveData(){
+		if($("#carno").val()==""){
+			top.Dialog.alert("车牌号不能为空！");
+			return false;
+		}
+		if($("#type").val()==""){
+			top.Dialog.alert("车辆型号不能为空！");
+			return false;
+		}
+		if($("#color").val()==""){
+			top.Dialog.alert("车辆颜色不能为空！");
+			return false;
+		}
+		if($("#image").val()==""){
+			top.Dialog.alert("车辆图片不能为空！");
+			return false;
+		}
+		if($("#owner").val()==""){
+			top.Dialog.alert("车主姓名不能为空！");
+			return false;
+		}
+		if($("#ownersfz").val()==""){
+			top.Dialog.alert("车主身份证号码不能为空！");
+			return false;
+		}else{
+			var reg = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X)$)/;
+			if(!reg.test($("#ownersfz").val())){
+				top.Dialog.alert("身份证格式不正确！");
+				return false;
+			}
+		}
+		if($("#ownerphone").val()==""){
+			top.Dialog.alert("车主手机号码不能为空！");
+			return false;
+		}else{
+			var reg=/^(13[0-9]|15[0-9]|177|147|18[0-9])[0-9]{8}$/;
+			if(!reg.test($("#ownerphone").val())){
+				top.Dialog.alert("手机号码格式不正确！");
+				return false;
+			}
+		}
+		$.ajax({
+			async:false,
+			url : getContextPath()+"/sub.do?method=editCar" ,
+			type: "POST",
+			data:$("#carForm").serialize(),
+			cache: false,
+			dataType:"json",
+			success:function(result){
+				if(result.state==1){
+					top.Dialog.alert(result.msg,function(){
+						top.Dialog.parentWindow.search();
+						top.Dialog.close();
+					});
+				}else{
+					top.Dialog.alert(result.msg);
+				}
+			},
+			error:function(){
+				top.Dialog.alert("操作异常");
+			}
+		});
+	}
+	
+	
+	$(function() {
+		$("#uploadify").uploadify({
+			debug			: false, 
+			swf 			: '${contextPath!}/js/uploadify/uploadify.swf',	//swf文件路径
+			method			: 'post',	// 提交方式
+			uploader		: 'filesUpload', // 服务器端处理该上传请求的程序(servlet, struts2-Action)
+			preventCaching	: true,		// 加随机数到URL后,防止缓存
+			buttonCursor	: 'hand',	// 上传按钮Hover时的鼠标形状
+			//buttonImage		: 'img/.....png',	// 按钮的背景图片,会覆盖文字
+			buttonText		: '上传文件'	, //按钮上显示的文字，默认”SELECTFILES”
+			height			: 30	, // 30 px
+			width			: 120	, // 120 px
+			fileObjName		: 'filedata',	//文件对象名称, 即属性名
+			fileSizeLimit	: '2MB'	,		// 文件大小限制, 100 KB
+			fileTypeDesc	: 'any'	,	//文件类型说明 any(*.*)
+			fileTypeExts	: '*.jpg;*.bmp;*.png',		// 允许的文件类型,分号分隔
+			formData		: {'id':'1', 'name':'myFile'} , //指定上传文件附带的其他数据。也动态设置。可通过getParameter()获取
+			
+			multi			: true ,	// 多文件上传
+			progressData	: 'speed',	// 进度显示, speed-上传速度,percentage-百分比	
+			queueID			: 'fileQueue',//上传队列的DOM元素的ID号
+			queueSizeLimit	: 99	,	// 队列长度
+			removeCompleted : false	,	// 上传完成后是否删除队列中的对应元素
+			removeTimeout	: 10	,	//上传完成后多少秒后删除队列中的进度条, 
+			requeueErrors	: true,	// 上传失败后重新加入队列
+			uploadLimit		: 20,	// 最多上传文件数量
+	
+			successTimeout	: 30	,//表示文件上传完成后等待服务器响应的时间。超过该时间，那么将认为上传成功。
+			
+			// 在文件被移除出队列时触发	
+			//onCancel : function(file) { alert( 'The file ' + file.name + ' was cancelled!' ); },
+			
+			// 在调用cancel方法且传入参数’*’时触发
+			//onClearQueue : function (queueItemCount) { alert( queueItemCount + ' files were removed from the queue!' ); },
+	
+			// 打开文件对话框 关闭时触发
+			onDialogClose : function (queueData) {
+			/*	alert(
+					"文件对话窗口中选了几个文件:" + queueData.filesSelected + "---" +
+					"队列中加了几个文件:" + queueData.filesQueued + "---" +
+					"队列中被替换掉的文件数:" + queueData.filesReplaced + "---" +
+					"取消掉的文件数:" + queueData.filesCancelled + "---" + 
+					"上传出错的文件数:" + queueData.filesErrored
+				); */
+			},
+			
+			// 选择文件对话框打开时触发
+			onDialogOpen : function () { /*alert( 'please select files' ) */ },
+		
+			// 没有兼容的FLASH时触发
+			onFallback : function(){ alert( 'Flash was not detected!' );},
+			
+			// 每次初始化一个队列时触发, 即浏览文件后, 加入一个队列
+			//onInit : function (instance) { alert( 'The queue ID is ' + instance.settings.queueID ) },
+		
+			// 上传文件处理完成后触发（每一个文件都触发一次）, 无论成功失败
+			//onUploadComplete : function(file){ alert( 'The file ' + file.name + ' uploaded finished!' ) },
+	
+			// 上传文件失败触发
+			onUploadError : function(file, errorCode, errorMsg, errorString){ 
+				top.Dialog.alert("文件上传失败！");
+	            /*
+	            alert(
+	                file.name + ' upload failed! ' + 
+	                'errorCode: ' + errorCode +
+	                'errorMsg:' + errorMsg +
+	                'errorString:' + errorString
+	            );*/
+			},
+              // 在每一个文件上传成功后触发
+              onUploadSuccess : function(file, data, response) {
+	              $("#showImg").attr("src","${contextPath}/"+data);
+	              $("#image").val(data);
+			  }
+
+			});
+		});
+</script>
+
+
+<body>
+	<div class="position">
+		<div class="center">
+			<div class="left">
+				<div class="right" style="width: 101%">
+					<span>当前位置：车辆管理&gt;&gt; 车辆编辑</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form id="carForm" method="post">
+		<input type="hidden" value="${carInfo.id!}" name="id" />
+		<input type="hidden" value="${carInfo.carbh!}" name="carbh" />
+		<table class="tableStyle" style="text-align: left;">
+			<tr>
+				<td width="80px;">车牌号：</td><td><input type="text" id="carno" name="carno" value="${carInfo.carno!}" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>车辆品牌：</td><td><input type="text" name="type" id="type" value="${carInfo.type!}" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>颜色：</td><td><input type="text" name="color" id="color" value="${carInfo.color!}" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>车辆图片：</td><td>
+					<input type="button" value="上传" id="uploadify" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td>图片展示：</td>
+				<td>
+					<input type="hidden" value="${carInfo.image!}" name="image" id="image"/>
+					<img width="122px;" height="122px;" alt="图片丢失" id="showImg"  src="${contextPath}/${carInfo.image!}" />
+				</td>
+			</tr>
+			
+			<tr>
+				<td>车主姓名：</td><td><input type="text" name="owner" id="owner" style="width: 180px;" value="${carInfo.owner!}" /></td>
+			</tr>
+			
+			<tr>
+				<td>车主性别：</td><td>男<input type="radio" name="ownersex" value="1"  <#if carInfo.ownersex==1>checked</#if> />女<input type="radio" value="0" name="ownersex"  <#if carInfo.ownersex==0>checked</#if> /></td>
+			</tr>
+			
+			<tr>
+				<td>车主身份证：</td><td><input type="text" name="ownersfz" id="ownersfz" style="width: 180px;" value="${carInfo.ownersfz!}" /></td>
+			</tr>
+			
+			<tr>
+				<td>车主电话：</td><td><input type="text" name="ownerphone" id="ownerphone" style="width: 180px;" value="${carInfo.ownerphone!}"/></td>
+			</tr>
+			
+			<tr>
+				<td>使用状态：</td>
+				<td>
+					<select name="state" style="width: 155px;" >
+						<option value="0" <#if carInfo.state==0>selected</#if> >未使用</option>
+						<option value="1" <#if carInfo.state==1>selected</#if> >正在使用</option>
+						<option value="2" <#if carInfo.state==2>selected</#if> >维修</option>
+						<option value="3" <#if carInfo.state==3>selected</#if> >报销</option>
+					</select>	
+				</td>
+			</tr>
+		</table>
+	</form>
+</body>

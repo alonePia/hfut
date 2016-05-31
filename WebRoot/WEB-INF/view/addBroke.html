@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<script type="text/javascript" src="js/jquery-1.4.js"></script>
+<script type="text/javascript" src="js/framework.js"></script>
+<link href="css/import_basic.css" rel="stylesheet" type="text/css" />
+<link href="skins/sky/import_skin.css" rel="stylesheet" type="text/css" />
+<!--框架必需end-->
+
+<script type="text/javascript" src="js/nav/ddaccordion.js"></script>
+<script type="text/javascript" src="js/text/text-overflow.js"></script>
+<script type="text/javascript" src="js/form/datePicker/WdatePicker.js"></script>
+
+<style>
+	
+</style>
+
+<script>
+	function getContextPath(){ 
+		var pathName = document.location.pathname; 
+		var index = pathName.substr(1).indexOf("/"); 
+		var result = pathName.substr(0,index+1); 
+		return result; 
+	} 
+
+	//保存操作
+	function saveData(){
+		if($("#age").val()==""){
+			top.Dialog.alert("年龄不能为空！");
+			return false;
+		}
+		$.ajax({
+			async:false,
+			url : getContextPath()+"/sub.do?method=saveBroke" ,
+			type: "POST",
+			data:$("#brokeForm").serialize(),
+			cache: false,
+			dataType:"json",
+			success:function(result){
+				if(result.state==1){
+					top.Dialog.alert(result.msg,function(){
+						top.Dialog.parentWindow.search();
+						top.Dialog.close();
+					});
+				}else{
+					top.Dialog.alert(result.msg);
+				}
+			},
+			error:function(){
+				top.Dialog.alert("操作异常");
+			}
+		});
+	}
+</script>
+
+
+<body>
+	<div class="position">
+		<div class="center">
+			<div class="left">
+				<div class="right" style="width: 101%">
+					<span>当前位置：信息查询&gt;&gt; 违章新增</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form id="brokeForm" method="post">
+		<table class="tableStyle" style="text-align: left;">
+			<tr>
+				<td width="80px;">姓名：</td><td><input type="text" id="username" name="username" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>性别：</td><td>男<input type="radio" name="sex" value="1" checked/>女<input type="radio" value="0" name="sex" /></td>
+			</tr>
+			
+			<tr>
+				<td>年龄：</td><td><input type="text" name="age" id="age" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>账号：</td><td><input type="text" name="accountNum" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>密码：</td><td><input type="password" name="password" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>确认密码：</td><td><input type="password" name="repassword" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>类型：</td>
+				<td>
+					<select name="type" >
+						<option value="0">管理员</option>
+						<option value="1">车主</option>
+						<option value="2">普通用户</option>
+					</select>	
+				</td>
+			</tr>
+			
+			<tr>
+				<td>身份证号码：</td><td><input type="text" name="sfz" style="width: 180px;"/></td>
+			</tr>
+			
+			<tr>
+				<td>电话号码：</td><td><input type="text" name="phone" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>住址：</td>
+				<td>
+					<textarea style="width:90%;" name="address"></textarea>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>是否开启权限：</td><td>是<input type="radio" name="permission" value="1" />否<input type="radio" name="permission" value="0" checked/></td>
+			</tr>
+		</table>
+	</form>
+</body>

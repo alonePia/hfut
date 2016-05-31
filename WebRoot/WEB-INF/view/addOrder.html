@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--框架必需start-->
+<script type="text/javascript" src="${contextPath!}/js/jquery-1.4.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/framework.js"></script>
+<link href="${contextPath!}/css/import_basic.css" rel="stylesheet" type="text/css" />
+<link href="${contextPath!}/skins/sky/import_skin.css" rel="stylesheet" type="text/css" />
+<!--框架必需end-->
+
+<script type="text/javascript" src="${contextPath!}/js/nav/ddaccordion.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/text/text-overflow.js"></script>
+<script type="text/javascript" src="${contextPath!}/js/form/datePicker/WdatePicker.js"></script>
+
+<style>
+	
+</style>
+
+<script>
+	function getContextPath(){ 
+		var pathName = document.location.pathname; 
+		var index = pathName.substr(1).indexOf("/"); 
+		var result = pathName.substr(0,index+1); 
+		return result; 
+	} 
+
+	//保存操作
+	function saveData(){
+		
+		if($("#price").val()==""){
+			top.Dialog.alert("租赁价格不能为空！");
+			return false;
+		}else{
+			var reg=/^[0-9]*$/;
+			if(!reg.test($("#price").val())){
+				top.Dialog.alert("价格格式不正确！");
+				return false;
+			}
+		}
+		
+		if($("#startTimes").val()==""){
+			top.Dialog.alert("开始时间不能为空！");
+			return false;
+		}
+		
+		if($("#endTimes").val()==""){
+			top.Dialog.alert("结束时间不能为空！");
+			return false;
+		}
+		
+		$.ajax({
+			async:false,
+			url : getContextPath()+"/sub.do?method=saveOrder" ,
+			type: "POST",
+			data:$("#orderForm").serialize(),
+			cache: false,
+			dataType:"json",
+			success:function(result){
+				if(result.state==1){
+					top.Dialog.alert(result.msg,function(){
+						top.Dialog.parentWindow.search();
+						top.Dialog.close();
+					});
+				}else{
+					top.Dialog.alert(result.msg);
+				}
+			},
+			error:function(){
+				top.Dialog.alert("操作异常");
+			}
+		});
+	}
+</script>
+
+
+<body>
+	<div class="position">
+		<div class="center">
+			<div class="left">
+				<div class="right" style="width: 101%">
+					<span>当前位置：用户信息&gt;&gt; 用户新增</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<form id="orderForm" method="post">
+		<table class="tableStyle" style="text-align: left;">
+			<tr>
+				<td width="80px;">申请姓名：</td><td>${currentUser.username!}<input type="hidden" id="userbh" name="userbh" value="${currentUser.userbh!}" style="width: 180px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>选择车辆：</td>
+				<td>
+					<select name="carbh">
+						<#list carList as car>
+						<#if car.state==0>
+						<option value="${car.carbh!}">${car.type!}</option>
+						</#if>
+						</#list>
+					</select>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>租赁价格：</td><td><input type="text" name="price" id="price" style="width: 120px;" /></td>
+			</tr>
+			
+			<tr>
+				<td>租赁状态：</td><td><input type="radio" name="isback" value="1" checked/>正在使用</td>
+			</tr>
+			
+			<tr>
+				<td>开始时间：</td><td><input type="text" class="date" name="startTimes" id="startTimes" /></td>
+			</tr>
+			
+			<tr>
+				<td>结束时间：</td><td><input type="text" class="date" name="endTimes" id="endTimes" /></td>
+			</tr>
+		</table>
+	</form>
+</body>

@@ -1,0 +1,37 @@
+@import "framework/reset.css";@import "framework/basic.css";@import "framework/position.css";@import "framework/form.css";@import "framework/icon.css";@import "framework/code.css";
+
+.page {
+	margin: 5px auto;
+}
+
+.g_a {
+	display: inline-block;
+	border-width: 1px 0;
+	border-color: #bbbbbb;
+	border-style: solid;
+	vertical-align: middle;
+}
+
+.g_b {
+	float: left;
+	background-color: #F8F8F8;
+	border-width: 0 1px;
+	border-color: #bbbbbb;
+	border-style: solid;
+	margin: 0 -1px;
+	position: relative;
+}
+
+.g_c {
+	display: block;
+	line-height: 0.6em;
+	background: #f9f9f9;
+	border-bottom: 2px solid #eeeeee;
+}
+
+.g_d {
+	display: block;
+	padding: 0.1em 0.6em;
+	margin-top: -0.6em;
+	cursor: pointer;
+}
